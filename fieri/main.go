@@ -1,21 +1,31 @@
 package main
 
 import (
-	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os/exec"
 	"runtime"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+func serveStaticHandler(fileName string) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// umieszczenie kodu wyżej powoduje domknięice 'data' -> nie da się odświeżać treści {
+		data, err := ioutil.ReadFile("static/" + fileName)
+		if err != nil {
+			http.NotFoundHandler().ServeHTTP(w, r)
+			return
+		}
+		// }
+		w.Write(data)
+	}
 }
 
 func main() {
 	wait := make(chan string)
 	go func() {
-		http.HandleFunc("/", handler)
+		http.HandleFunc("/", serveStaticHandler("index.html"))
+		http.HandleFunc("/testNotFound", serveStaticHandler("not-exists.html"))
 		log.Fatal(http.ListenAndServe(":8080", nil))
 		wait <- "finished"
 	}()
@@ -23,7 +33,8 @@ func main() {
 	<-wait
 }
 
-//source: https://stackoverflow.com/questions/39320371/how-start-web-server-to-open-page-in-browser-in-golang
+// testowy czy się da - fajna opcja
+// source: https://stackoverflow.com/questions/39320371/how-start-web-server-to-open-page-in-browser-in-golang
 func openBrowser(url string) error {
 	var cmd string
 	var args []string
