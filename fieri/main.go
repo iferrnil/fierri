@@ -1,11 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os/exec"
 	"runtime"
+
+	"github.com/iferrnil/fieri/todo"
 )
 
 func serveStaticHandler(fileName string) func(w http.ResponseWriter, r *http.Request) {
@@ -21,11 +24,39 @@ func serveStaticHandler(fileName string) func(w http.ResponseWriter, r *http.Req
 	}
 }
 
+func listTaskHandler(w http.ResponseWriter, r *http.Request) {
+	var tasks = make([]todo.ToDoItem, todo.TodoList.Len())
+	for i, e := 0, todo.TodoList.Front(); e != nil; e, i = e.Next(), i+1 {
+		log.Print(e.Value)
+		tasks[i] = e.Value.(todo.ToDoItem)
+	}
+	log.Print(tasks)
+	json, err := json.Marshal(tasks)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(json)
+}
+
+func taskHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		todo.Add("Test")
+	case http.MethodGet:
+	case http.MethodDelete:
+	case http.MethodPut:
+		log.Fatal("Not implemented")
+	}
+}
+
 func main() {
 	wait := make(chan string)
 	go func() {
 		http.HandleFunc("/", serveStaticHandler("index.html"))
 		http.HandleFunc("/testNotFound", serveStaticHandler("not-exists.html"))
+		http.HandleFunc("/api/list_task", listTaskHandler)
+		http.HandleFunc("/api/task", taskHandler)
 		log.Fatal(http.ListenAndServe(":8080", nil))
 		wait <- "finished"
 	}()
