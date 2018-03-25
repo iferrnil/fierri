@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os/exec"
 	"runtime"
+	"strings"
 
 	"github.com/iferrnil/fieri/todo"
 )
@@ -39,11 +40,29 @@ func listTaskHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(json)
 }
 
+func retriveGid(path string) (gid string) {
+	parts := strings.Split(path, "/")
+	gid = parts[len(parts)-1]
+	return
+}
+
 func taskHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		todo.Add("Test")
 	case http.MethodGet:
+		gid := retriveGid(r.URL.Path)
+		todo := todo.FindByGid(gid)
+		if todo == nil {
+			http.NotFoundHandler().ServeHTTP(w, r)
+			return
+		}
+		json, err := json.Marshal(todo)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Write(json)
 	case http.MethodDelete:
 	case http.MethodPut:
 		log.Fatal("Not implemented")
@@ -53,10 +72,11 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	wait := make(chan string)
 	go func() {
-		http.HandleFunc("/", serveStaticHandler("index.html"))
 		http.HandleFunc("/testNotFound", serveStaticHandler("not-exists.html"))
 		http.HandleFunc("/api/list_task", listTaskHandler)
+		http.HandleFunc("/api/task/", taskHandler)
 		http.HandleFunc("/api/task", taskHandler)
+		http.HandleFunc("/", serveStaticHandler("index.html"))
 		log.Fatal(http.ListenAndServe(":8080", nil))
 		wait <- "finished"
 	}()
