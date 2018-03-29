@@ -29,6 +29,12 @@ func Add(what string) {
 	})
 }
 
+func init() {
+	Add("Dodać obsługę dodawania przez API")
+	Add("Dodać trwałe składowanie")
+
+}
+
 func FindByGid(gid string) (result *ToDoItem) {
 	for e := TodoList.Front(); e != nil; e = e.Next() {
 		if e.Value.(ToDoItem).Gid == gid {
