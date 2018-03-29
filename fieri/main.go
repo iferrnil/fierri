@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/iferrnil/fieri/todo"
+	"github.com/iferrnil/iferrnil/fieri/todo"
 )
 
 func serveStaticHandler(fileName string) func(w http.ResponseWriter, r *http.Request) {
