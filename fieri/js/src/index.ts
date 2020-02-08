@@ -1,14 +1,14 @@
 
 import Vue from 'vue';
-import Items from './Items.vue';
+import Page from './Page.vue';
 
-console.log(Items);
+console.log(Page);
 const app = new Vue({
-  el: '#Items',
+  el: '#Page',
   data: {
   },
   render: function(createElement) {
-    return createElement(Items, {})
+    return createElement(Page, {})
   }
 });
 
