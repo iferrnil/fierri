@@ -21,6 +21,13 @@ func serveStaticHandler(fileName string) func(w http.ResponseWriter, r *http.Req
 			return
 		}
 		// }
+		contentType := "text/plain"
+		if strings.HasSuffix(fileName, ".js") {
+			contentType = "text/javascript"
+		} else if strings.HasSuffix(fileName, ".html") {
+			contentType = "text/html"
+		}
+		w.Header().Add("Content-Type", contentType+"; charset=UTF-8")
 		w.Write(data)
 	}
 }
@@ -37,6 +44,7 @@ func listTaskHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	w.Header().Add("Content-Type", "application/json")
 	w.Write(json)
 }
 
@@ -50,6 +58,8 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		todo.Add("Test")
+		w.Header().Add("Content-Type", "application/json")
+		w.Write([]byte("{}"))
 	case http.MethodGet:
 		gid := retriveGid(r.URL.Path)
 		todo := todo.FindByGid(gid)
@@ -62,6 +72,7 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		w.Header().Add("Content-Type", "application/json")
 		w.Write(json)
 	case http.MethodDelete:
 	case http.MethodPut:
@@ -76,6 +87,8 @@ func main() {
 		http.HandleFunc("/api/list_task", listTaskHandler)
 		http.HandleFunc("/api/task/", taskHandler)
 		http.HandleFunc("/api/task", taskHandler)
+		http.HandleFunc("/index.js", serveStaticHandler("index.js"))
+		http.HandleFunc("/index.js.map", serveStaticHandler("index.js.map"))
 		http.HandleFunc("/", serveStaticHandler("index.html"))
 		log.Fatal(http.ListenAndServe(":8080", nil))
 		wait <- "finished"

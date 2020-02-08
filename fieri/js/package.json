@@ -1,0 +1,35 @@
+{
+  "name": "parcel-vue",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "parcel-build": "parcel build src/index.ts -d ../static/"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vue/component-compiler-utils": "3.1.1",
+    "@popperjs/core": "2.0.5",
+    "bootstrap": "4.4.1",
+    "typescript": "^3.7.5",
+    "vue": "2.6.11",
+    "vue-hot-reload-api": "2.3.4",
+    "vue-property-decorator": "8.4.0"
+  },
+  "alias": {
+    "vue": "./node_modules/vue/dist/vue.common.js"
+  },
+  "devDependencies": {
+    "@types/node": "13.7.0",
+    "chai": "4.2.0",
+    "cypress": "4.0.1",
+    "jsdom": "16.1.0",
+    "jsdom-global": "3.0.2",
+    "mocha": "7.0.1",
+    "vue-template-compiler": "2.6.11",
+    "parcel-bundler": "1.12.4"
+  }
+}

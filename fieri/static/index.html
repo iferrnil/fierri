@@ -6,61 +6,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <script src="https://unpkg.com/vue"></script>
-    <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 <body>
   <main role="main" class="container">
     <h1 class="mt-5">Simple TODO app with GO & Vue</h1>
     <h2></h2>
     <p class="lead">Power of Go by example</p>
-
-
-    <div id="Items">
-      <table class="table">
-          <tr>
-              <th>Items</th>
-          </tr>
-          <tr v-for="item in items">
-              <td :id=item.gid>{{item.todo}}</td>
-          <tr>
-      </table>
-  </div>
+    <div id="Items"></div>
+   
   </main>
-
-
-  <script>
-
-    // https://stackoverflow.com/questions/32413905/initializing-vue-data-with-ajax
-
-    var Items = new Vue({
-    el: '#Items',
-    data: {
-        items: []
-    },
-    mounted: function () {
-        var self = this;
-        $.ajax({
-            url: '/api/list_task',
-            method: 'GET',
-            success: function (data) {
-                self.items = JSON.parse(data);
-                console.log(self.items)
-            },
-            error: function (error) {
-                console.log(error);
-            }
-        });
-    }
-});
-  </script>
-
-
+  <script type="text/javascript" src="index.js"></script>
 </body>
 </html>

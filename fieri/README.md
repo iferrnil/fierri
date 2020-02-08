@@ -7,3 +7,6 @@ Założenia:
 - baza w pamięci
 - restowe API
 - zabawa
+
+# Proces dewelopmentu VUE
+Katalog js zaklada posiadanie node vs npm
