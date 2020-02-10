@@ -58,8 +58,7 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		todo.Add("Test")
-		w.Header().Add("Content-Type", "application/json")
-		w.Write([]byte("{}"))
+		listTaskHandler(w, r)
 	case http.MethodGet:
 		gid := retriveGid(r.URL.Path)
 		todo := todo.FindByGid(gid)
