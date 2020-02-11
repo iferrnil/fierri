@@ -15,23 +15,17 @@
 import Vue from 'vue';
 import Component from 'vue-class-component'
 
-@Component
-class Items extends Vue {
-    
-    private items: Array<any> = []
-    private mounted() {
-        console.log('mount')
-        var self = this;
-        fetch('/api/list_task', {
-            method: 'GET'
-        })
-        .then(resp => resp.json())
-        .then((taks) => {
-            self.items = taks;
-        }).catch((error) =>  {
-            console.log(error);
-        });
+@Component({
+    props: {
+        items: Array<any>
     }
+})
+class Items extends Vue {
+    private mounted() {
+        console.log(this.$props);
+        //this.updateTasks();
+    }
+    
 }
 
 export default Items;

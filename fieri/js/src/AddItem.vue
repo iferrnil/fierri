@@ -13,7 +13,11 @@
 import Vue from 'vue';
 import Component from 'vue-class-component'
 
-@Component
+@Component({
+    props: {
+        taskAdded: Function
+    }
+})
 class AddItem extends Vue {
     
     task: string
@@ -34,6 +38,8 @@ class AddItem extends Vue {
             body: JSON.stringify({
                 task: this.task
             })
+        }).then(()=> {
+            this.$props.taskAdded();
         })
         return false;
     }

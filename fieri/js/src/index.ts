@@ -8,6 +8,7 @@ const app = new Vue({
   data: {
   },
   render: function(createElement) {
+    console.log(Page);
     return createElement(Page, {})
   }
 });
