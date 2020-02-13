@@ -2,7 +2,7 @@
     <form class="jumbotron">
         <div class="form-group">
             <label for-html="add-item">Task</label>
-            <input v-model="task" class="form-control" id="add-item" type="text" name="task" placeholder="Type task"/>
+            <input v-model="todo" class="form-control" id="add-item" type="text" name="todo" placeholder="Type task"/>
         </div>
         <button class="btn btn-primary" v-on:click="add">Add</button>
     </form>
@@ -20,7 +20,7 @@ import Component from 'vue-class-component'
 })
 class AddItem extends Vue {
     
-    task: string
+    todo: string
 
     private mounted() {
         
@@ -28,7 +28,6 @@ class AddItem extends Vue {
 
     private add(event: MouseEvent) {
         event.preventDefault();
-        console.log(this.task);
 
          fetch('/api/task', {
             headers: {
@@ -36,10 +35,10 @@ class AddItem extends Vue {
             },
             method: 'POST',
             body: JSON.stringify({
-                task: this.task
+                todo: this.todo
             })
         }).then(()=> {
-            this.$props.taskAdded();
+            this.$props.taskAdded();            
         })
         return false;
     }

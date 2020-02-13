@@ -54,10 +54,18 @@ func retriveGid(path string) (gid string) {
 	return
 }
 
+type taskInput struct {
+	Data string `json:"todo"`
+}
+
 func taskHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
-		todo.Add("Test")
+		decoder := json.NewDecoder(r.Body)
+		input := &taskInput{}
+		decoder.Decode(input)
+		todo.Add(input.Data)
+		// zwróc listę
 		listTaskHandler(w, r)
 	case http.MethodGet:
 		gid := retriveGid(r.URL.Path)
