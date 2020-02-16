@@ -1,5 +1,5 @@
 <template>
-    <form class="jumbotron">
+    <form class="jumbotron" id="add-item-form">
         <div class="form-group">
             <label for-html="add-item">Task</label>
             <input v-model="todo" class="form-control" id="add-item" type="text" name="todo" placeholder="Type task"/>
@@ -28,7 +28,8 @@ class AddItem extends Vue {
 
     private add(event: MouseEvent) {
         event.preventDefault();
-
+        console.log(event);
+        var vue = this;
          fetch('/api/task', {
             headers: {
                 'Content-Type': 'application/json'
@@ -39,7 +40,13 @@ class AddItem extends Vue {
             })
         }).then(()=> {
             this.$props.taskAdded();            
+            
+            var form: Element = document.querySelector('form#add-item-form');
+            if (form && form instanceof HTMLFormElement) {
+                form.reset();
+            }
         })
+      
         return false;
     }
 }
