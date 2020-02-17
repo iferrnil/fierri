@@ -1,32 +1,26 @@
 <template>
-    <form class="jumbotron" id="add-item-form">
-        <div class="form-group">
-            <label for-html="add-item">Task</label>
-            <input v-model="todo" class="form-control" id="add-item" type="text" name="todo" placeholder="Type task"/>
-        </div>
-        <button class="btn btn-primary" v-on:click="add">Add</button>
-    </form>
+    <form-input gid={{null}} todo="" label="Add" @form-send="add" ref="form"/>
 </template>
 
 <script lang="ts">
 
 import Vue from 'vue';
-import Component from 'vue-class-component'
+import Component from 'vue-class-component';
+import FormInput from './FormItem';
 
 @Component({
-    props: {
-        taskAdded: Function
+    components: {
+        'form-input': FormInput
     }
 })
 class AddItem extends Vue {
     
-    todo: string
 
     private mounted() {
         
     }
 
-    private add(event: MouseEvent) {
+    private add(data: {todo: String, gid: String}) {
         event.preventDefault();
         console.log(event);
         var vue = this;
@@ -36,15 +30,11 @@ class AddItem extends Vue {
             },
             method: 'POST',
             body: JSON.stringify({
-                todo: this.todo
+                todo: data.todo
             })
         }).then(()=> {
-            this.$props.taskAdded();            
-            
-            var form: Element = document.querySelector('form#add-item-form');
-            if (form && form instanceof HTMLFormElement) {
-                form.reset();
-            }
+            this.$emit('value-added');
+            vue.$refs.form.reset();
         })
       
         return false;

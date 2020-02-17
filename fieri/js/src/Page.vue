@@ -4,7 +4,7 @@
             <items :items="items" />
         </div>
         <div>
-            <add-item :taskAdded="onAdded" />
+            <add-item @value-added="onAdded" />
         </div>
     </div>
 </template>
