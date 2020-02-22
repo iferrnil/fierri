@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "parcel": "parcel src/index.ts",
     "parcel-build": "parcel build src/index.ts -d ../static/"
   },
   "keywords": [],

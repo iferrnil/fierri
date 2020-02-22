@@ -9,7 +9,7 @@
                 name="todo" 
                 placeholder="Type task"/>
 
-            <input value="{{gid}}"
+            <input :value="gid"
                 hidden
                 class="form-control" 
                 id="add-item" 
