@@ -1,5 +1,5 @@
 <template>
-    <form-input gid={{null}} todo="" label="Add" @form-send="add" ref="form"/>
+    <form-input :gid="null" todo="" label="Add" @form-send="add" ref="form"/>
 </template>
 
 <script lang="ts">

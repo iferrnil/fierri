@@ -3,8 +3,10 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 
 	"github.com/iferrnil/fieri/server"
 )
@@ -13,24 +15,50 @@ func main() {
 	wait := make(chan string)
 
 	taskApi := &server.TaskAPI{}
+
+	var resourceHandler http.Handler = resourceHandler()
+
+	go func() {
+		http.Handle("/api/", taskApi)
+		http.Handle("/", resourceHandler)
+		log.Fatal(http.ListenAndServe(":8080", nil))
+		wait <- "finished"
+	}()
+	openBrowser("http://localhost:8080")
+	<-wait
+}
+
+func resourceHandler() http.Handler {
+
+	devRun := os.Getenv("TODO_DEV_RUN")
 	pathToFile := map[string]string{
 		"/testNotFound": "not-exists.html",
 		"/index.js":     "index.js",
 		"/index.js.map": "index.js.map",
 		"/":             "index.html",
 	}
-	staticHandler := &server.StaticHandler{
-		PathToFile: pathToFile,
+	if devRun == "" {
+		return &server.StaticHandler{
+			PathToFile: pathToFile,
+		}
+	} else {
+		proxyPattern := func(path string) bool {
+			if strings.HasSuffix(path, ".js") {
+				return true
+			}
+			if strings.HasSuffix(path, ".js.map") {
+				return true
+			}
+			return false
+		}
+		return &server.ProxyHandler{
+			PathToFile:   pathToFile,
+			ProxyPattern: proxyPattern,
+			ProxyUrl:     "http://localhost:1234",
+			ProxyPath:    "",
+		}
 	}
 
-	go func() {
-		http.Handle("/api/", taskApi)
-		http.Handle("/", staticHandler)
-		log.Fatal(http.ListenAndServe(":8080", nil))
-		wait <- "finished"
-	}()
-	openBrowser("http://localhost:8080")
-	<-wait
 }
 
 // testowy czy się da - fajna opcja
