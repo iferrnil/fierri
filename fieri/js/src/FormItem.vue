@@ -18,6 +18,7 @@
                 placeholder="Type task"/>
         </div>
         <button class="btn btn-primary" v-on:click="formSend">{{label}}</button>
+        <button class="btn btn-primary" v-on:click="cancel">Cancel</button>
     </form>
 </template>
 
@@ -55,6 +56,12 @@ class AddItem extends Vue {
             gid: this.$props.gid
         })
       
+        return false;
+    }
+
+    private cancel(event: MouseEvent) {
+        event.preventDefault();
+        this.$emit('form-cancel', {})
         return false;
     }
 }

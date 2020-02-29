@@ -1,5 +1,5 @@
 <template>
-    <form-input :gid="null" todo="" label="Add" @form-send="add" @form-cancel="cancel" ref="form"/>
+    <form-input :gid="null" todo="" label="Edit" @form-send="edit" @form-cancel="cancel" ref="form"/>
 </template>
 
 <script lang="ts">
@@ -13,14 +13,14 @@ import FormInput from './FormItem';
         'form-input': FormInput
     }
 })
-class AddItem extends Vue {
+class EditItem extends Vue {
     
 
     private mounted() {
         
     }
 
-    private add(data: {todo: String, gid: String}) {
+    private edit(data: {todo: String, gid: String}) {
         event.preventDefault();
         console.log(event);
         var vue = this;
@@ -28,12 +28,13 @@ class AddItem extends Vue {
             headers: {
                 'Content-Type': 'application/json'
             },
-            method: 'POST',
+            method: 'PUT',
             body: JSON.stringify({
+                gid: data.gid,
                 todo: data.todo
             })
         }).then(()=> {
-            this.$emit('value-added');
+            this.$emit('value-edited');
             vue.$refs.form.reset();
         })
       
@@ -41,11 +42,11 @@ class AddItem extends Vue {
     }
 
     private cancel() {
-        this.$emit('add-canceled');
+        this.$emit('edit-canceled');
     }
 }
 
-export default AddItem;
+export default EditItem;
 </script>
 
 <style>
