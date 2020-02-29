@@ -24,19 +24,12 @@ func (t *TaskAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func listTaskHandler(w http.ResponseWriter, r *http.Request) {
-	var tasks = make([]todo.ToDoItem, todo.TodoList.Len())
-	for i, e := 0, todo.TodoList.Front(); e != nil; e, i = e.Next(), i+1 {
-		log.Print(e.Value)
-		tasks[i] = e.Value.(todo.ToDoItem)
+	tasks := todo.List()
+	output := make([]toDoItem, len(tasks))
+	for i, value := range tasks {
+		output[i] = toDoItem(value)
 	}
-	log.Print(tasks)
-	json, err := json.Marshal(tasks)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	w.Header().Add("Content-Type", "application/json")
-	w.Write(json)
+	writeJson(output, w)
 }
 
 func retriveGid(path string) (gid string) {
@@ -45,35 +38,65 @@ func retriveGid(path string) (gid string) {
 	return
 }
 
-type taskInput struct {
-	Data string `json:"todo"`
+type toDoItem struct {
+	ToDo string `json:"todo"`
+	Gid  string `json:"gid"`
+}
+
+func fromReq(r *http.Request) *toDoItem {
+	decoder := json.NewDecoder(r.Body)
+	input := &toDoItem{}
+	err := decoder.Decode(input)
+	if err != nil {
+		log.Fatalf("Cannot parse json %v", err)
+		return nil
+	}
+	input.Gid = retriveGid(r.URL.Path)
+	return input
+}
+
+func writeJson(v interface{}, w http.ResponseWriter) {
+	json, err := json.Marshal(v)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Header().Add("Content-Type", "application/json")
+	w.Write(json)
 }
 
 func taskHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
-		decoder := json.NewDecoder(r.Body)
-		input := &taskInput{}
-		decoder.Decode(input)
-		todo.Add(input.Data)
-		// zwróc listę
-		listTaskHandler(w, r)
+		input := fromReq(r)
+		if input == nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		log.Printf("input %v", input.ToDo)
+		newItem := todo.Add(input.ToDo)
+		output := toDoItem(*newItem)
+		writeJson(&output, w)
 	case http.MethodGet:
 		gid := retriveGid(r.URL.Path)
-		todo := todo.FindByGid(gid)
-		if todo == nil {
+		elem := todo.FindByGid(gid)
+		if elem == nil {
 			http.NotFoundHandler().ServeHTTP(w, r)
 			return
 		}
-		json, err := json.Marshal(todo)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		w.Header().Add("Content-Type", "application/json")
-		w.Write(json)
+		output := toDoItem(*elem)
+		writeJson(&output, w)
 	case http.MethodDelete:
 	case http.MethodPut:
-		log.Fatal("Not implemented")
+		input := fromReq(r)
+		currentTodo := todo.FindByGid(input.Gid)
+		if currentTodo == nil {
+			http.NotFoundHandler().ServeHTTP(w, r)
+			return
+		}
+		currentTodo.ToDo = input.ToDo
+		updated := todo.Update(*currentTodo)
+		output := toDoItem(*updated)
+		writeJson(&output, w)
 	}
 }
