@@ -1,10 +1,10 @@
 <template>
     <form class="jumbotron" id="item-form">
         <div class="form-group">
-            <label for-html="add-item">Task</label>
+            <label for-html="task-input">Task</label>
             <input v-model="todo" 
                 class="form-control" 
-                id="add-item" 
+                id="task-input" 
                 type="text" 
                 name="todo" 
                 placeholder="Type task"/>
@@ -12,7 +12,7 @@
             <input :value="gid"
                 hidden
                 class="form-control" 
-                id="add-item" 
+                id="gid-input" 
                 type="text" 
                 name="todo" 
                 placeholder="Type task"/>

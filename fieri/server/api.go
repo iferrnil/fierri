@@ -97,6 +97,6 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 		currentTodo.ToDo = input.ToDo
 		updated := todo.Update(*currentTodo)
 		output := toDoItem(*updated)
-		writeJson(&output, w)
+		writeJson(output, w)
 	}
 }

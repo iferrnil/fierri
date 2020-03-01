@@ -7,7 +7,7 @@
         </tr>
         <tr v-for="item in items">
             <td :id=item.gid>{{item.todo}}</td>
-            <td><button v-if="canEdit" v-on:click="onEdit" class="btn btn-secondary">Edit</button></td>
+            <td><button v-if="canEdit" v-on:click="onEditClick" v-bind:data-gid="item.gid" class="btn btn-secondary">Edit</button></td>
         <tr>
     </table>
 </template>
@@ -17,18 +17,15 @@
 import Vue from 'vue';
 import Component from 'vue-class-component'
 
-interface ItemsProps {
-    
-}
 
 @Component({
     props: {
         items: {
             type: Array<any>
-        }
+        },
         onEdit: {
             type: Function
-        }
+        },
         canEdit: {
             type: Boolean
         }
@@ -38,6 +35,14 @@ class Items extends Vue {
     private mounted() {
         console.log(this.$props);
         //this.updateTasks();
+    }
+
+    onEditClick(ev: MouseEvent) {
+        if (ev.target instanceof HTMLElement) {
+            const element: HTMLElement = ev.target;
+            const gid: string = element.dataset['gid'];
+            this.$props.onEdit(gid);
+        }
     }
     
    

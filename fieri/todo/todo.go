@@ -41,10 +41,10 @@ func init() {
 
 func Update(newValue ToDoItem) *ToDoItem {
 	for e := todoList.Front(); e != nil; e = e.Next() {
-		elem := e.Value.(ToDoItem)
+		elem := e.Value.(*ToDoItem)
 		if elem.Gid == newValue.Gid {
 			elem.ToDo = newValue.ToDo
-			return &elem
+			return elem
 		}
 	}
 	return nil

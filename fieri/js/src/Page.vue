@@ -4,10 +4,10 @@
             <items :items="items" :onEdit="onEdit" :canEdit="formEnabled"/>
         </div>
         <div v-if="showAddForm">
-            <add-item @value-added="refreshList" @add-canceled="formCancel" />
+            <add-item @value-added="addEditFinished" @add-canceled="formCancel" />
         </div>
          <div v-if="showEditForm">
-            <edit-item @value-added="refreshList" @edit-canceled="formCancel" />
+            <edit-item @value-edited="addEditFinished" @edit-canceled="formCancel" :gid="edit.gid" :todo="edit.todo" />
         </div>
         <button v-if="formEnabled" v-on:click="onAdd" class="btn btn-secondary">Add new</button>
     </div>
@@ -21,6 +21,11 @@ import AddItem from './AddItem'
 import EditItem from './EditItem'
 import Items from './Items'
 
+interface Item {
+    gid: String
+    todo: String
+}
+
 @Component({
     name: 'Page',
     components: {
@@ -31,6 +36,7 @@ import Items from './Items'
 })
 export default class Page extends Vue {
 
+    edit: Item = null
     showAddForm: boolean = false
     showEditForm: boolean = false
     items: Array<any> = []
@@ -54,12 +60,15 @@ export default class Page extends Vue {
         });
     }
 
-    refreshList() {
+    addEditFinished() {
+        this.formCancel();
         this.fetchTasks();
     }
 
-    onEdit() {
+    onEdit(gid: string) {
         this.showEditForm = true;
+        this.edit = this.items.find(element => element.gid == gid)
+        console.log(this.edit)
     }
 
     onAdd() {

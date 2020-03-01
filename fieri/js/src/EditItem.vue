@@ -1,5 +1,5 @@
 <template>
-    <form-input :gid="null" todo="" label="Edit" @form-send="edit" @form-cancel="cancel" ref="form"/>
+    <form-input :gid="gid" :todo="todo" label="Edit" @form-send="edit" @form-cancel="cancel" ref="form"/>
 </template>
 
 <script lang="ts">
@@ -9,6 +9,14 @@ import Component from 'vue-class-component';
 import FormInput from './FormItem';
 
 @Component({
+    props: {
+        gid: {
+            type: String
+        },
+        todo: {
+            type: String
+        }
+    },
     components: {
         'form-input': FormInput
     }
@@ -24,7 +32,7 @@ class EditItem extends Vue {
         event.preventDefault();
         console.log(event);
         var vue = this;
-         fetch('/api/task', {
+        fetch(`/api/task/${data.gid}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
