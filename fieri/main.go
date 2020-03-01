@@ -42,20 +42,20 @@ func resourceHandler() http.Handler {
 			PathToFile: pathToFile,
 		}
 	} else {
-		proxyPattern := func(path string) bool {
+		proxyTest := func(path string) server.MatchInfo {
 			if strings.HasSuffix(path, ".js") {
-				return true
+				return server.NewMatch("text/javascript;charset=UTF-8", "alert('Parcel is not runnig')")
 			}
 			if strings.HasSuffix(path, ".js.map") {
-				return true
+				return server.NewMatch("application/json", "{}")
 			}
-			return false
+			return server.NoMatch()
 		}
 		return &server.ProxyHandler{
-			PathToFile:   pathToFile,
-			ProxyPattern: proxyPattern,
-			ProxyUrl:     "http://localhost:1234",
-			ProxyPath:    "",
+			PathToFile: pathToFile,
+			ProxyTest:  proxyTest,
+			ProxyUrl:   "http://localhost:1234",
+			ProxyPath:  "",
 		}
 	}
 

@@ -12,46 +12,55 @@ type StaticHandler struct {
 	PathToFile map[string]string
 }
 
+type MatchInfo struct {
+	Match           bool
+	ContentType     string
+	FallbackContent string
+}
+
+func NewMatch(contentType string, fallback string) MatchInfo {
+	return MatchInfo{FallbackContent: fallback, Match: true, ContentType: contentType}
+}
+
+func NoMatch() MatchInfo {
+	return MatchInfo{Match: false}
+}
+
 type ProxyHandler struct {
-	PathToFile   map[string]string
-	ProxyPattern func(string) bool
-	ProxyUrl     string
-	ProxyPath    string
+	PathToFile map[string]string
+	ProxyTest  func(string) MatchInfo
+	ProxyUrl   string
+	ProxyPath  string
 }
 
 func (ph *ProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
-	if !ph.ProxyPattern(path) {
+	matchInfo := ph.ProxyTest(path)
+	if !matchInfo.Match {
 		(&StaticHandler{PathToFile: ph.PathToFile}).ServeHTTP(w, r)
 		return
 	}
 	var client *http.Client = http.DefaultClient
 	var fullPath = ph.ProxyUrl + ph.ProxyPath + path
 	resp, err := client.Get(fullPath)
+	w.Header().Add("Content-Type", matchInfo.ContentType)
 	if err != nil {
 		// fallback
-	}
-
-	log.Print("Server headers:", resp.Header)
-
-	for header, value := range resp.Header {
-		if header == "Content-Type" && len(value) > 0 {
-			w.Header().Add(header, value[0])
-		}
-	}
-
-	const BUFFOR_SIZE = 4096
-	var buffor []byte = make([]byte, BUFFOR_SIZE)
-	for {
-		n, err := resp.Body.Read(buffor)
-		if n > 0 {
-			w.Write(buffor[0:n])
-		}
-		if io.EOF == err {
-			break
-		} else if err != nil {
-			log.Fatalf("Proxy failed", err)
-			break
+		w.Write([]byte(matchInfo.FallbackContent))
+	} else {
+		const BUFFOR_SIZE = 4096
+		var buffor []byte = make([]byte, BUFFOR_SIZE)
+		for {
+			n, err := resp.Body.Read(buffor)
+			if n > 0 {
+				w.Write(buffor[0:n])
+			}
+			if io.EOF == err {
+				break
+			} else if err != nil {
+				log.Fatalf("Proxy failed", err)
+				break
+			}
 		}
 	}
 }
