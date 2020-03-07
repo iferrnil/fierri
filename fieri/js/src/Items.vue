@@ -4,10 +4,12 @@
         <tr>
             <th>Items</th>
             <th></th>
+            <th></th>
         </tr>
         <tr v-for="item in items">
             <td :id=item.gid>{{item.todo}}</td>
             <td><button v-if="canEdit" v-on:click="onEditClick" v-bind:data-gid="item.gid" class="btn btn-secondary">Edit</button></td>
+            <td><button v-if="canEdit" v-on:click="onRemoveClick" v-bind:data-gid="item.gid" class="btn btn-secondary">Remove</button></td>
         <tr>
     </table>
 </template>
@@ -26,6 +28,9 @@ import Component from 'vue-class-component'
         onEdit: {
             type: Function
         },
+        onRemove: {
+            type: Function
+        },
         canEdit: {
             type: Boolean
         }
@@ -37,12 +42,20 @@ class Items extends Vue {
         //this.updateTasks();
     }
 
-    onEditClick(ev: MouseEvent) {
+    private onButtonClick(ev: MouseEvent, action: (String)=>void) {
         if (ev.target instanceof HTMLElement) {
             const element: HTMLElement = ev.target;
             const gid: string = element.dataset['gid'];
-            this.$props.onEdit(gid);
+            action(gid);
         }
+    }
+
+    onEditClick(ev: MouseEvent) {
+        this.onButtonClick(ev, this.$props.onEdit);
+    }
+
+    onRemoveClick(ev: MouseEvent) {
+        this.onButtonClick(ev, this.$props.onRemove);
     }
     
    

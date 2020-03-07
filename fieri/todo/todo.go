@@ -50,6 +50,18 @@ func Update(newValue ToDoItem) *ToDoItem {
 	return nil
 }
 
+func Remove(gid string) *ToDoItem {
+	for e := todoList.Front(); e != nil; e = e.Next() {
+		p, ok := e.Value.(*ToDoItem)
+		if ok && p.Gid == gid {
+			copy := ToDoItem(*p)
+			todoList.Remove(e)
+			return &copy
+		}
+	}
+	return nil
+}
+
 func FindByGid(gid string) (result *ToDoItem) {
 	for e := todoList.Front(); e != nil; e = e.Next() {
 		p, ok := e.Value.(*ToDoItem)

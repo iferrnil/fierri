@@ -87,6 +87,14 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 		output := toDoItem(*elem)
 		writeJson(&output, w)
 	case http.MethodDelete:
+		gid := retriveGid(r.URL.Path)
+		deleted := todo.Remove(gid)
+		if deleted == nil {
+			http.NotFoundHandler().ServeHTTP(w, r)
+			return
+		}
+		output := toDoItem(*deleted)
+		writeJson(output, w)
 	case http.MethodPut:
 		input := fromReq(r)
 		currentTodo := todo.FindByGid(input.Gid)

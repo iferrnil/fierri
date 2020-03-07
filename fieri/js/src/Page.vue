@@ -1,7 +1,7 @@
 <template>
     <div>
         <div>
-            <items :items="items" :onEdit="onEdit" :canEdit="formEnabled"/>
+            <items :items="items" :onEdit="onEdit" :canEdit="formEnabled" :onRemove="onRemove" />
         </div>
         <div v-if="showAddForm">
             <add-item @value-added="addEditFinished" @add-canceled="formCancel" />
@@ -69,6 +69,19 @@ export default class Page extends Vue {
         this.showEditForm = true;
         this.edit = this.items.find(element => element.gid == gid)
         console.log(this.edit)
+    }
+
+    onRemove(gid: string) {
+        var self = this;
+        fetch('/api/task/' + gid, {
+            method: 'DELETE'
+        })
+        .then(resp => resp.json())
+        .then(() => {
+            this.fetchTasks();
+        }).catch((error) =>  {
+            console.log(error);
+        });
     }
 
     onAdd() {
