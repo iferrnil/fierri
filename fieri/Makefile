@@ -17,6 +17,8 @@ run:
 
 run-dev: build run-with-parcel
 
+postgres:
+	docker run -it -e "POSTGRES_PASSWORD=Muonoo4p" -v "$(shell pwd)/db:/docker-entrypoint-initdb.d/" -p 5433:5432 postgres:12-alpine 
 
 .PHONY: run-dev
 
