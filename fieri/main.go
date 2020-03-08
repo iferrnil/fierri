@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -8,14 +10,20 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/iferrnil/fieri/database"
 	"github.com/iferrnil/fieri/server"
 	"github.com/iferrnil/fieri/todo"
 )
 
 func main() {
+	db, err := database.Connect()
+	if err != nil {
+		panic(fmt.Errorf("Cannot connect to DB %v", err))
+	}
+	defer db.Close()
+	ctx := context.Background()
 	wait := make(chan string)
-
-	var inMemoryApi todo.ToDo = todo.NewMemoryTodo(10)
+	var inMemoryApi todo.ToDo = todo.NewDbTodo(10, ctx, db)
 	var taskApi http.Handler = server.NewApi(inMemoryApi)
 
 	var resourceHandler http.Handler = resourceHandler()

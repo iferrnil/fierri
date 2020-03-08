@@ -20,7 +20,7 @@ type ToDo interface {
 	Remove(string) (*ToDoItem, error)
 	Update(*ToDoItem) (*ToDoItem, error)
 	List() ([]ToDoItem, error)
-	Size() int
+	Size() (int, error)
 }
 
 type ToDoItem struct {
