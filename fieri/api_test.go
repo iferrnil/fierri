@@ -8,10 +8,16 @@ import (
 	"testing"
 
 	"github.com/iferrnil/fieri/server"
+	"github.com/iferrnil/fieri/todo"
 )
 
+func buildApi() http.Handler {
+	var todo todo.ToDo = todo.NewMemoryTodo(10)
+	return server.NewApi(todo)
+}
+
 func TestGetTasks(t *testing.T) {
-	taskApi := &server.TaskAPI{}
+	taskApi := buildApi()
 	request, err := http.NewRequest("GET", "/api/list_task", nil)
 	if err != nil {
 		t.Fatal(err)
@@ -38,7 +44,7 @@ func TestGetTasks(t *testing.T) {
 }
 
 func TestAddAndGetTask(t *testing.T) {
-	taskApi := &server.TaskAPI{}
+	var taskApi http.Handler = buildApi()
 	createRequest, cErr := http.NewRequest("POST", "/api/task", strings.NewReader("{\"todo\": \"Test\"}"))
 	if cErr != nil {
 		t.Fatal(cErr)

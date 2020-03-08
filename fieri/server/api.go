@@ -9,22 +9,36 @@ import (
 	"github.com/iferrnil/fieri/todo"
 )
 
-type TaskAPI struct {
+type taskAPI struct {
+	todo todo.ToDo
 }
 
-func (t *TaskAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func NewApi(todo todo.ToDo) *taskAPI {
+	return &taskAPI{todo: todo}
+}
+
+func handleError(w http.ResponseWriter, err error) {
+	log.Fatal("Unexpected api error", err)
+	w.WriteHeader(http.StatusInternalServerError)
+	return
+}
+
+func (t *taskAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 	apiTask := strings.TrimPrefix(path, "/api/")
 	if strings.HasPrefix(apiTask, "list_task") {
-
-		listTaskHandler(w, r)
+		t.listTaskHandler(w, r)
 	} else if strings.HasPrefix(apiTask, "task") {
-		taskHandler(w, r)
+		t.taskHandler(w, r)
 	}
 }
 
-func listTaskHandler(w http.ResponseWriter, r *http.Request) {
-	tasks := todo.List()
+func (t *taskAPI) listTaskHandler(w http.ResponseWriter, r *http.Request) {
+	tasks, err := t.todo.List()
+	if err != nil {
+		handleError(w, err)
+		return
+	}
 	output := make([]toDoItem, len(tasks))
 	for i, value := range tasks {
 		output[i] = toDoItem(value)
@@ -65,7 +79,7 @@ func writeJson(v interface{}, w http.ResponseWriter) {
 	w.Write(json)
 }
 
-func taskHandler(w http.ResponseWriter, r *http.Request) {
+func (t *taskAPI) taskHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		input := fromReq(r)
@@ -74,12 +88,20 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Printf("input %v", input.ToDo)
-		newItem := todo.Add(input.ToDo)
+		newItem, err := t.todo.Add(input.ToDo)
+		if err != nil {
+			handleError(w, err)
+			return
+		}
 		output := toDoItem(*newItem)
 		writeJson(&output, w)
 	case http.MethodGet:
 		gid := retriveGid(r.URL.Path)
-		elem := todo.FindByGid(gid)
+		elem, err := t.todo.FindByGid(gid)
+		if err != nil {
+			handleError(w, err)
+			return
+		}
 		if elem == nil {
 			http.NotFoundHandler().ServeHTTP(w, r)
 			return
@@ -88,7 +110,11 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 		writeJson(&output, w)
 	case http.MethodDelete:
 		gid := retriveGid(r.URL.Path)
-		deleted := todo.Remove(gid)
+		deleted, err := t.todo.Remove(gid)
+		if err != nil {
+			handleError(w, err)
+			return
+		}
 		if deleted == nil {
 			http.NotFoundHandler().ServeHTTP(w, r)
 			return
@@ -97,13 +123,21 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 		writeJson(output, w)
 	case http.MethodPut:
 		input := fromReq(r)
-		currentTodo := todo.FindByGid(input.Gid)
+		currentTodo, err := t.todo.FindByGid(input.Gid)
+		if err != nil {
+			handleError(w, err)
+			return
+		}
 		if currentTodo == nil {
 			http.NotFoundHandler().ServeHTTP(w, r)
 			return
 		}
 		currentTodo.ToDo = input.ToDo
-		updated := todo.Update(*currentTodo)
+		updated, err := t.todo.Update(currentTodo)
+		if err != nil {
+			handleError(w, err)
+			return
+		}
 		output := toDoItem(*updated)
 		writeJson(output, w)
 	}

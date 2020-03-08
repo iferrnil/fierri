@@ -9,12 +9,14 @@ import (
 	"strings"
 
 	"github.com/iferrnil/fieri/server"
+	"github.com/iferrnil/fieri/todo"
 )
 
 func main() {
 	wait := make(chan string)
 
-	taskApi := &server.TaskAPI{}
+	var inMemoryApi todo.ToDo = todo.NewMemoryTodo(10)
+	var taskApi http.Handler = server.NewApi(inMemoryApi)
 
 	var resourceHandler http.Handler = resourceHandler()
 
