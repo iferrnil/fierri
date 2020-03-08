@@ -72,3 +72,7 @@ func (mt *MemoryTodo) List() ([]ToDoItem, error) {
 	}
 	return tasks, nil
 }
+
+func (mt *MemoryTodo) Size() int {
+	return mt.list.Len()
+}

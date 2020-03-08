@@ -17,6 +17,7 @@ func buildApi() http.Handler {
 }
 
 func TestGetTasks(t *testing.T) {
+	t.Logf("TestGetTasks")
 	taskApi := buildApi()
 	request, err := http.NewRequest("GET", "/api/list_task", nil)
 	if err != nil {
@@ -44,6 +45,7 @@ func TestGetTasks(t *testing.T) {
 }
 
 func TestAddAndGetTask(t *testing.T) {
+	t.Logf("TestAddAndGetTask")
 	var taskApi http.Handler = buildApi()
 	createRequest, cErr := http.NewRequest("POST", "/api/task", strings.NewReader("{\"todo\": \"Test\"}"))
 	if cErr != nil {
